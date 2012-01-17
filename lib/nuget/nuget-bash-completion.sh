@@ -3,6 +3,7 @@
 # To use, run the following:
 #   source `pwd`/nuget_bash_completion.sh
 
+#default nuget actions
 actions="
  delete 
  install 
@@ -16,17 +17,20 @@ actions="
  update
  help
 "
+#action parameters that apply to all nuget actions
 allActions="
  -h 
  -Help 
  ?
 "
+#action parameters that apply to the delete action
 deleteActions="
  -Source 
  -NoPrompt 
  -ApiKey
  ${allActions}
 "
+#action parameters that apply to the install action
 installActions="
  -Source 
  -OutputDirectory 
@@ -35,6 +39,7 @@ installActions="
  -Prerelease 
  ${allActions}
 "
+#action parameters that apply to the list action
 listActions="
  -Source 
  -Verbose 
@@ -42,6 +47,7 @@ listActions="
  -Prerelease
  ${allActions}
 "
+#action parameters that apply to the pack action
 packActions="
  -OutputDirectory    
  -BasePath           
@@ -56,30 +62,36 @@ packActions="
  -Properties       
  ${allActions}
 "
+#action parameters that apply to the publish action
 publishActions="
  -Source
  ${allActions}
 "
+#action parameters that apply to the push action
 pushActions="
  -CreateOnly 
  -Source     
  -ApiKey     
  ${allActions}
 "
+#action parameters that apply to the setApiKey action
 setApiKeyActions="
  -Source
  ${allActions}
 "
+#action parameters that apply to the sources action
 sourcesActions="
  -Name
  -Source
  ${allActions}
 "
+#action parameters that apply to the spec action
 specActions="
  -AssemblyPath 
  -Force
  ${allActions}
 "
+#action parameters that apply to the update action
 updateActions="
  -Source       
  -Id         
@@ -90,11 +102,13 @@ updateActions="
  -Prerelease    
  ${allActions}
 "
+#action parameters that apply to the help action
 helpActions="
  -All 
  -Markdown
  ${allActions}
 "
+#directories where nuget packages can be found and used for auto completion when invoking the update action
 nugetPackageDirectories="
 ./packages
 ${HOME}/.nuget/packages
@@ -120,10 +134,8 @@ _invoke_nuget_completion()
 
     case "$prev" in
     # base commands for nuget
-	#delete|install|list|pack|publish|push|setApiKeysources|spec|update|help)
 	help)
         # handle standard actions when preceded by help
-	#if [[ "$prev" == "help" ]]; then
 		local opts=$(
 			for o in ${actions[*]}; do
 				[[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
@@ -131,7 +143,6 @@ _invoke_nuget_completion()
 		)
         	COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
 		return
-	#fi
 	;;
         delete)
                 local opts=$(
@@ -231,7 +242,6 @@ _invoke_nuget_completion()
  				fi
 			done
 		)
-		#local packageNames=$(\ls ./packages | sed -e "s/\.dll//g")
                 local opts=$(
 			for o in ${updateActions[*]}; do
                                 [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
@@ -242,8 +252,6 @@ _invoke_nuget_completion()
         ;;
 
 	*)
-		local packageNames=$(\ls ./packages | sed -e "s/\.dll//g")
-        	COMPREPLY=( $(compgen -W "${packageNames}" -- ${cur}) )
         	return
         ;;
     esac
