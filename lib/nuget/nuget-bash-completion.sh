@@ -16,9 +16,10 @@ actions="
  spec
  update
  help
+ test
 "
 #action parameters that apply to all nuget actions
-allActions="
+globalActions="
  -h 
  -Help 
  ?
@@ -28,7 +29,6 @@ deleteActions="
  -Source 
  -NoPrompt 
  -ApiKey
- ${allActions}
 "
 #action parameters that apply to the install action
 installActions="
@@ -37,7 +37,6 @@ installActions="
  -Version 
  -ExcludeVersion 
  -Prerelease 
- ${allActions}
 "
 #action parameters that apply to the list action
 listActions="
@@ -45,7 +44,6 @@ listActions="
  -Verbose 
  -AllVersions 
  -Prerelease
- ${allActions}
 "
 #action parameters that apply to the pack action
 packActions="
@@ -60,36 +58,30 @@ packActions="
  -NoDefaultExcludes  
  -NoPackageAnalysis  
  -Properties       
- ${allActions}
 "
 #action parameters that apply to the publish action
 publishActions="
  -Source
- ${allActions}
 "
 #action parameters that apply to the push action
 pushActions="
  -CreateOnly 
  -Source     
  -ApiKey     
- ${allActions}
 "
 #action parameters that apply to the setApiKey action
 setApiKeyActions="
  -Source
- ${allActions}
 "
 #action parameters that apply to the sources action
 sourcesActions="
  -Name
  -Source
- ${allActions}
 "
 #action parameters that apply to the spec action
 specActions="
  -AssemblyPath 
  -Force
- ${allActions}
 "
 #action parameters that apply to the update action
 updateActions="
@@ -100,20 +92,43 @@ updateActions="
  -Self           
  -Verbose        
  -Prerelease    
- ${allActions}
 "
 #action parameters that apply to the help action
 helpActions="
  -All 
  -Markdown
- ${allActions}
 "
 #directories where nuget packages can be found and used for auto completion when invoking the update action
 nugetPackageDirectories="
 ./packages
 ${HOME}/.nuget/packages
 "
+# check for existence of package directories in common locations
+# and parse the packages found in each directory, writing the name of the 
+# package out as an auto complete option
+_get_installed_package_names() {
+	for dir in ${nugetPackageDirectories[*]}; do
+		if test -d $dir; then 
+			ls $dir | sed -e "s/\.dll//g"
+		fi
+	done
+}
 
+# invoke the action completion process on the array of words passed into the function
+# from a calling member
+_invoke_nuget_action_completion() {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	local localActions="${@}"
+	local opts=$(
+		for o in ${localActions[*]}; do
+			[[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
+		done
+	)
+	COMPREPLY=( $(compgen -W "${opts} ${globalActions}" -- "${cur}") )
+	return
+}
+
+# invoke the initial action completion process on the current action 
 _invoke_nuget_completion()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -132,124 +147,50 @@ _invoke_nuget_completion()
         prev="${COMP_WORDS[prev_index]}"
     done
 
+    # take the action in the index just before the <tab> key press and call the 
+    # _invoke_nuget_action_complete function with the related actions subactions 
     case "$prev" in
     # base commands for nuget
 	help)
-        # handle standard actions when preceded by help
-		local opts=$(
-			for o in ${actions[*]}; do
-				[[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-			done
-		)
-        	COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-		return
+		_invoke_nuget_action_completion $actions
+	;;
+	test)
+		_invoke_nuget_action_completion $testActions
 	;;
         delete)
-                local opts=$(
-                        for o in ${deleteActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return
+		_invoke_nuget_action_completion $deleteActions
         ;;
 	install)
-                local opts=$(
-                        for o in ${installActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return
+		_invoke_nuget_action_completion $installActions
 	;;
 	list)
-                local opts=$(
-                        for o in ${listActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return
+		_invoke_nuget_action_completion $listActions
 	;;
         pack)
-                local opts=$(
-                        for o in ${packActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return	
+                _invoke_nuget_action_completion $packActions
 	;;
         publish)
-                local opts=$(
-                        for o in ${publishActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return 
+		_invoke_nuget_action_completion $publishActions
         ;;
         pack)
-                local opts=$(
-                        for o in ${packActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return 
+		_invoke_nuget_action_completion $packActions        
         ;;
         push)
-                local opts=$(
-                        for o in ${pushActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return 
+		_invoke_nuget_action_completion $pushActions                
         ;;
         setApiKey)
-                local opts=$(
-                        for o in ${setApiKeyActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return 
+		_invoke_nuget_action_completion $setApiKeyActions        
         ;;
         sources)
-                local opts=$(
-                        for o in ${sourcesActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return 
+		_invoke_nuget_action_completion $sourcesActions                
         ;;
         spec)
-                local opts=$(
-                        for o in ${specActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
-                return 
+		_invoke_nuget_action_completion $specActions        
         ;;
         update)
-		local packageNames=$(
-			for dir in ${nugetPackageDirectories[*]}; do
-				if test -d $dir; then 
-					ls $dir | sed -e "s/\.dll//g"
- 				fi
-			done
-		)
-                local opts=$(
-			for o in ${updateActions[*]}; do
-                                [[ " ${COMP_WORDS[*]} " =~ " $o " ]] || echo "$o"
-                        done
-                )
-                COMPREPLY=( $(compgen -W "${opts} ${packageNames}" -- ${cur}) )
-                return 
-        ;;
+		getInstalledPackageName=$(_get_installed_package_names)
+        	_invoke_nuget_action_completion $updateActions $getInstalledPackageName 
+	;;
 
 	*)
         	return
