@@ -16,7 +16,6 @@ actions="
  spec
  update
  help
- test
 "
 #action parameters that apply to all nuget actions
 globalActions="
