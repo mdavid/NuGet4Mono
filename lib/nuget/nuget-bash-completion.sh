@@ -188,8 +188,7 @@ _invoke_nuget_completion()
 		_invoke_nuget_action_completion $specActions        
         ;;
         update)
-		getInstalledPackageName=$(_get_installed_package_names)
-        	_invoke_nuget_action_completion $updateActions $getInstalledPackageName 
+        	_invoke_nuget_action_completion $updateActions $(_get_installed_package_names) 
 	;;
 
 	*)
