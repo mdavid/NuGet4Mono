@@ -57,7 +57,7 @@ Available commands:
 For more information, visit http://docs.nuget.org/docs/reference/command-line-reference
 ```
 
-With or without tab completion support for first level nuget commands in place you can now invoke any of those commands using the parameter values and syntax specific to each. At present time tab completion support for second level commands hasn't been added. If anyone feels like adding that support (and either already knows how or can figure it out by reading the shell script ) before I have a chance to, please don't hesitate to fork/hack/push/pull request away :)  In the mean time you'll need to preceded each first level command with 'help' to gain access to that commands related parameters as well as any subcommands.  For example:
+With or without tab completion support for first level nuget commands in place you can now invoke any of those commands using the parameter values and syntax specific to each. As of commit bde308cc3acb85bf27ec094f0da5cc9b6522423e full support for both first and second level actions and related -parameters has been added.  To view help specific to each command you can either preface the top level action you want extended usage info for with 'help':
 
 ```bash
 $ tools/bin/nuget help install
@@ -78,4 +78,14 @@ options:
  -Help                 (?)  help
 
 For more information, visit http://docs.nuget.org/docs/reference/command-line-reference
+```
+
+... or you can use the &lt;tab> key just after the action to gain a preview of the available -parameters for that action. e.g.
+
+```bash
+$ nuget <tab> 
+delete     help       install    list       pack       publish    push       setApiKey  sources    spec       test       update     
+
+$ nuget install <tab> 
+-ExcludeVersion   -Help             -OutputDirectory  -Prerelease       -Source           -Version          -h                ?
 ```
