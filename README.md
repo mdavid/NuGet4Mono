@@ -80,7 +80,7 @@ options:
 For more information, visit http://docs.nuget.org/docs/reference/command-line-reference
 ```
 
-... or you can use the <tab> key just after the action to gain a preview of the available -parameters for that action. e.g.
+... or you can use the &lt;tab> key just after the action to gain a preview of the available -parameters for that action. e.g.
 
 ```bash
 $ nuget <tab> 
