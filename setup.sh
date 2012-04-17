@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 NUGETROOT=$HOME/.nuget
-PREFIX=/usr/local
+PREFIX=$1/usr/local
 COMPLETIONBASEDIR=$PREFIX/etc/
 COMPLETIONSDIR=$COMPLETIONBASEDIR/bash-completion.d
 COMPLETIONSCRIPT=$COMPLETIONBASEDIR/bash_completion
