@@ -14,7 +14,7 @@ for i in $HOME/.nugetrc; do
 done
 
 # Clone NuGet4Mono into .nuget
-git clone https://github.com/mdavid/NuGet4Mono.git $HOME/.nuget \
+git clone -b v0.1-dev https://github.com/mdavid/NuGet4Mono.git $HOME/.nuget \
   || die "Could not clone the repository to ${HOME}/.nuget"
 
 # Run setup.sh inside .nuget

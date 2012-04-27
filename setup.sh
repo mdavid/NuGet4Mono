@@ -4,9 +4,9 @@ NUGETROOT=$HOME/.nuget
 PREFIX=$1/usr/local
 COMPLETIONBASEDIR=$PREFIX/etc/
 COMPLETIONSDIR=$COMPLETIONBASEDIR/bash-completion.d
-COMPLETIONSCRIPT=$COMPLETIONBASEDIR/bash_completion
+COMPLETIONSCRIPT=$COMPLETIONSDIR/bash_completion
 
-INSTALLWITHBREW=true
+INSTALLWITHBREW=true;
 hash brew 2>&- || { 
   INSTALLWITHBREW=false;
   ISDEBIANBASED=true;
@@ -16,11 +16,15 @@ hash brew 2>&- || {
   fi
 
 }
-if [ $INSTALLWITHBREW ]; then
+
+echo $INSTALLWITHBREW;
+
+if [ $INSTALLWITHBREW == true ]; then
   brew install bash-completion
 fi
 
-ln -s "`pwd`/lib/nuget/nuget-bash-completion.sh" "$COMPLETIONSDIR"
+mkdir -p $COMPLETIONSDIR
+ln -s "`pwd`/lib/nuget/nuget-bash-completion.sh" "$COMPLETIONSCRIPT"
 
 . $COMPLETIONSCRIPT
 
@@ -32,4 +36,4 @@ fi
 EOF
 }
 
-append_bash_profile >> $USER/.bash_profile
+append_bash_profile >> $HOME/.bash_profile
