@@ -9,9 +9,12 @@ COMPLETIONSCRIPT=$COMPLETIONBASEDIR/bash_completion
 INSTALLWITHBREW=true
 hash brew 2>&- || { 
   INSTALLWITHBREW=false;
-  git submodule update --init
-  cd lib/module/bash-completion && aclocal && autoconf && automake && ./configure --prefix=/usr/local
-  make install
+  ISDEBIANBASED=true;
+  if [ $ISDEBIANBASED ]; then
+	BASHCOMPLETIONINSTALLED=$(dpkg-query -W -f='${Status} ${Version}\n' bash-completion | cut -d' ' -f2);
+	echo $BASHCOMPLETIONINSTALLED;
+  fi
+
 }
 if [ $INSTALLWITHBREW ]; then
   brew install bash-completion
