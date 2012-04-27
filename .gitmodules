@@ -1,3 +1,0 @@
-[submodule "lib/module/bash-completion"]
-	path = lib/module/bash-completion
-	url = git://git.debian.org/git/bash-completion/bash-completion.git
