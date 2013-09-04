@@ -35,7 +35,7 @@ install_bash_completion() {
 
 symlink_and_source(){
 	log_info "Symlinking nuget-bash-completion.sh."
-	ln -s "`pwd`/lib/nuget/nuget-bash-completion.sh" "$COMPLETIONSCRIPT" 2>&- || {
+	ln -sf "`pwd`/lib/nuget/nuget-bash-completion.sh" "$COMPLETIONSCRIPT" 2>&- || {
 		log_info "`pwd`/lib/nuget/nuget-bash-completion.sh previously symlinked to $COMPLETIONSCRIPT";
 	}
 	log_info "Sourcing $COMPLETIONSCRIPT."
