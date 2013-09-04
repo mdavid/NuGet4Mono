@@ -5,23 +5,33 @@
 
 #default nuget actions
 actions="
+ config
  delete 
+ help
  install 
- list 
- pack 
- publish 
- push 
+ list
+ mirror
+ pack
+ push
+ restore
  setApiKey
  sources
  spec
  update
- help
 "
 #action parameters that apply to all nuget actions
 globalActions="
  -h 
- -Help 
- ?
+ -Help
+ -?
+ -Verbosity
+ -NonInteractive
+ -ConfigFile
+"
+#action parameters that apply to the config action
+configActions="
+ -Set
+ -AsPath
 "
 #action parameters that apply to the delete action
 deleteActions="
@@ -36,6 +46,10 @@ installActions="
  -Version 
  -ExcludeVersion 
  -Prerelease 
+ -NoCache
+ -RequiresConsent
+ -SolutionsDirectory
+ -DisableParallel 
 "
 #action parameters that apply to the list action
 listActions="
@@ -44,6 +58,18 @@ listActions="
  -AllVersions 
  -Prerelease
 "
+
+#action parameters that apply to the mirror action
+mirrorActions="
+ -Source 
+ -Version
+ -ApiKey 
+ -Prerelease
+ -Timeout
+ -NoCache
+ -NoOp
+"
+
 #action parameters that apply to the pack action
 packActions="
  -OutputDirectory    
@@ -55,18 +81,17 @@ packActions="
  -Tool               
  -Build              
  -NoDefaultExcludes  
- -NoPackageAnalysis  
- -Properties       
-"
-#action parameters that apply to the publish action
-publishActions="
- -Source
+ -NoPackageAnalysis 
+ -ExcludeEmptyDirectories 
+ -IncludeReferencedProjects 
+ -Properties
+ -MinClientVersion
 "
 #action parameters that apply to the push action
 pushActions="
- -CreateOnly 
  -Source     
  -ApiKey     
+ -Timeout
 "
 #action parameters that apply to the setApiKey action
 setApiKeyActions="
@@ -76,12 +101,26 @@ setApiKeyActions="
 sourcesActions="
  -Name
  -Source
+ -UserName
+ -Password
+ -StorePasswordInClearText 
 "
 #action parameters that apply to the spec action
 specActions="
  -AssemblyPath 
  -Force
 "
+
+#action parameters that apply to the restore action
+restoreActions="
+ -Source 
+ -NoCache
+ -RequireConsent
+ -DisableParallelProcessing
+ -PackagesDirectory
+ -SolutionDirectory
+"
+
 #action parameters that apply to the update action
 updateActions="
  -Source       
@@ -90,11 +129,13 @@ updateActions="
  -Safe           
  -Self           
  -Verbose        
- -Prerelease    
+ -Prerelease  
+ -FileConflictAction   
 "
 #action parameters that apply to the help action
 helpActions="
- -All 
+${actions}
+ -All
  -Markdown
 "
 #directories where nuget packages can be found and used for auto completion when invoking the update action
@@ -108,7 +149,7 @@ ${HOME}/.nuget/packages
 _get_installed_package_names() {
 	for dir in ${nugetPackageDirectories[*]}; do
 		if test -d $dir; then 
-			ls $dir | sed -e "s/\.dll//g"
+			ls $dir | sed -e "s/.[0-9]\([0-9]*\)//g"
 		fi
 	done
 }
@@ -134,7 +175,7 @@ _invoke_nuget_completion()
 
     # Subcommand list
     [[ ${COMP_CWORD} -eq 1 ]] && {
-        COMPREPLY=( $(compgen -W "${actions} ${allActions}" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "${actions}" -- ${cur}) )
         return
     }
 
@@ -150,49 +191,55 @@ _invoke_nuget_completion()
     # _invoke_nuget_action_complete function with the related actions subactions 
     case "$prev" in
     # base commands for nuget
-	help)
-		_invoke_nuget_action_completion $actions
-	;;
-	test)
-		_invoke_nuget_action_completion $testActions
-	;;
+		help)
+			_invoke_nuget_action_completion $helpActions
+			;;
+		test)
+			_invoke_nuget_action_completion $testActions
+			;;
+		config)
+			_invoke_nuget_action_completion $configActions
+        	;;
         delete)
-		_invoke_nuget_action_completion $deleteActions
-        ;;
-	install)
-		_invoke_nuget_action_completion $installActions
-	;;
-	list)
-		_invoke_nuget_action_completion $listActions
-	;;
+			_invoke_nuget_action_completion $deleteActions
+        	;;
+		install)
+			_invoke_nuget_action_completion $installActions
+			;;
+		list)
+			_invoke_nuget_action_completion $listActions
+			;;
+		mirror)
+			_invoke_nuget_action_completion $mirrorActions
+			;;
         pack)
-                _invoke_nuget_action_completion $packActions
-	;;
-        publish)
-		_invoke_nuget_action_completion $publishActions
-        ;;
-        pack)
-		_invoke_nuget_action_completion $packActions        
-        ;;
-        push)
-		_invoke_nuget_action_completion $pushActions                
-        ;;
-        setApiKey)
-		_invoke_nuget_action_completion $setApiKeyActions        
-        ;;
-        sources)
-		_invoke_nuget_action_completion $sourcesActions                
-        ;;
-        spec)
-		_invoke_nuget_action_completion $specActions        
-        ;;
-        update)
-        	_invoke_nuget_action_completion $updateActions $(_get_installed_package_names) 
-	;;
+			_invoke_nuget_action_completion $packActions
+			;;
+		pack)
+			_invoke_nuget_action_completion $packActions        
+			;;
+		push)
+			_invoke_nuget_action_completion $pushActions                
+			;;
+		restore)
+			_invoke_nuget_action_completion $restoreActions
+			;;
+		setApiKey)
+			_invoke_nuget_action_completion $setApiKeyActions        
+			;;
+		sources)
+			_invoke_nuget_action_completion $sourcesActions                
+			;;
+		spec)
+			_invoke_nuget_action_completion $specActions        
+			;;
+		update)
+			_invoke_nuget_action_completion $updateActions $(_get_installed_package_names) 
+			;;
 
-	*)
-        	return
-        ;;
+		*)
+			return
+        	;;
     esac
 }
 
